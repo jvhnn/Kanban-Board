@@ -5,10 +5,11 @@ import { ApiMessage } from '../interfaces/ApiMessage';
 interface SwimlaneProps {
   title: string;
   tickets: TicketData[];
-  deleteTicket: (ticketId: number) => Promise<ApiMessage>
+  deleteTicket: (ticketId: number) => Promise<ApiMessage>;
+  checkLogin: () => boolean;
 }
 
-const Swimlane = ({ title, tickets, deleteTicket }: SwimlaneProps) => {
+const Swimlane = ({ title, tickets, deleteTicket, checkLogin }: SwimlaneProps) => {
   const getStatusClass = (status: string) => {
     switch (status) {
       case 'Todo':
@@ -26,10 +27,11 @@ const Swimlane = ({ title, tickets, deleteTicket }: SwimlaneProps) => {
     <div className={`swimlane ${getStatusClass(title)}`}>
       <h2>{title}</h2>
       {tickets.map(ticket => (
-        <TicketCard 
+        <TicketCard
           key={ticket.id}
           ticket={ticket}
           deleteTicket={deleteTicket}
+          checkLogin={checkLogin}
         />
       ))}
     </div>

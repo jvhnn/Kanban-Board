@@ -4,8 +4,13 @@ import { createTicket } from '../api/ticketAPI';
 import { TicketData } from '../interfaces/TicketData';
 import { UserData } from '../interfaces/UserData';
 import { retrieveUsers } from '../api/userAPI';
+import withLoginCheck from '../components/withLoginCheck.js';
 
-const CreateTicket = () => {
+interface CreateTicketProps {
+  checkLogin: () => boolean;
+}
+
+const CreateTicket: React.FC<CreateTicketProps> = ({ checkLogin }) => {
   const [newTicket, setNewTicket] = useState<TicketData | undefined>(
     {
       id: 0,
@@ -36,6 +41,12 @@ const CreateTicket = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+
+    if (!checkLogin()) {
+      navigate('/login');
+      return;
+    }
+
     if (newTicket){
       const data = await createTicket(newTicket);
       console.log(data);
@@ -118,4 +129,4 @@ const CreateTicket = () => {
   )
 };
 
-export default CreateTicket;
+export default withLoginCheck(CreateTicket);

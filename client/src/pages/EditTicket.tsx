@@ -1,10 +1,14 @@
 import { useState, useEffect, FormEvent, ChangeEvent } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-
 import { retrieveTicket, updateTicket } from '../api/ticketAPI';
 import { TicketData } from '../interfaces/TicketData';
+import WithLoginCheck from '../components/withLoginCheck.js'
 
-const EditTicket = () => {
+interface EditTicketProps {
+  checkLogin: () => boolean;
+}
+
+const EditTicket: React.FC<EditTicketProps> = ({ checkLogin }) => {
   const [ticket, setTicket] = useState<TicketData | undefined>();
 
   const navigate = useNavigate();
@@ -25,6 +29,12 @@ const EditTicket = () => {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
+
+    if (!checkLogin()) {
+      navigate('/login');
+      return;
+    }
+
     if (ticket && ticket.id !== null){
       updateTicket(ticket.id, ticket);
       navigate('/');
@@ -87,4 +97,4 @@ const EditTicket = () => {
   );
 };
 
-export default EditTicket;
+export default WithLoginCheck(EditTicket);

@@ -1,5 +1,5 @@
 import { useState, FormEvent, ChangeEvent } from "react";
-
+import { useNavigate } from 'react-router-dom';
 import Auth from '../utils/auth';
 import { login } from "../api/authAPI";
 
@@ -8,6 +8,8 @@ const Login = () => {
     username: '',
     password: ''
   });
+  const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -19,11 +21,13 @@ const Login = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setErrorMessage('');
     try {
       const data = await login(loginData);
-      Auth.login(data.token);
+      Auth.login(data, navigate);
     } catch (err) {
       console.error('Failed to login', err);
+      setErrorMessage('Failed to login');
     }
   };
 
@@ -45,7 +49,8 @@ const Login = () => {
           value={loginData.password || ''}
           onChange={handleChange}
         />
-        <button type='submit'>Submit Form</button>
+        <button type='submit'>Login</button>
+        {errorMessage && <p className="error">{errorMessage}</p>}
       </form>
     </div>
     

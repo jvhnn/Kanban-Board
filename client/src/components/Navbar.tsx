@@ -1,20 +1,26 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import auth from '../utils/auth';
+import withLoginCheck from './withLoginCheck.js';
 
-const Navbar = () => {
-  const [ loginCheck, setLoginCheck ] = useState(false);
+interface NavbarProps {
+  checkLogin: () => boolean;
+}
 
-  const checkLogin = () => {
-    if(auth.loggedIn()) {
-      setLoginCheck(true);
+const Navbar: React.FC<NavbarProps> = ({ checkLogin }) => {
+  const navigate = useNavigate();
+
+  const handleNewTicket = () => {
+    if (!checkLogin()) {
+      auth.logout(navigate);
+      return;
     }
+
+    navigate('/create');
   };
 
-  useEffect(() => {
-    console.log(loginCheck);
-    checkLogin();
-  }, [loginCheck])
+  const handleLogout = () => {
+    auth.logout(navigate);
+  };
 
   return (
     <div className='nav'>
@@ -22,24 +28,31 @@ const Navbar = () => {
         <Link to='/'>Krazy Kanban Board</Link>
       </div>
       <ul>
-      {
-        !loginCheck ? (
-          <li className='nav-item'>
-            <button type='button'>
-              <Link to='/login'>Login</Link>
-            </button>
-          </li>
-        ) : (
-          <li className='nav-item'>
-            <button type='button' onClick={() => {
-              auth.logout();
-            }}>Logout</button>
-          </li>
-        )
-      }
+        {
+          !checkLogin() ? (
+            <li className='nav-item'>
+              <button type='button'>
+                <Link to='/login'>Login</Link>
+              </button>
+            </li>
+          ) : (
+            <>
+              <li className='nav-item'>
+                <button type='button' id='create-ticket-link' onClick={handleNewTicket}>
+                  New Ticket
+                </button>
+              </li>
+              <li className='nav-item'>
+                <button type='button' onClick={handleLogout}>
+                  Logout
+                </button>
+              </li>
+            </>
+          )
+        }
       </ul>
     </div>
-  )
+  );
 }
 
-export default Navbar;
+export default withLoginCheck(Navbar);
